@@ -12,9 +12,10 @@ connectDB();
 app.use(express.json());
 
 // Define Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/users', require('./routes/users'));
-app.use('/api/history', require('./routes/history'));
+app.use('/api/auth', require('./api/auth'));
+app.use('/api/users', require('./api/users'));
+app.use('/api/history', require('./api/history'));
+
 
 // High Score Route
 app.post('/api/highscore', async (req, res) => {
