@@ -2,6 +2,7 @@ const express = require('express');
 const connectDB = require('./config/db');
 const path = require('path');
 const HighScore = require('./models/HighScore'); // High score model import
+
 const app = express();
 
 // Connect DB with error handling
@@ -30,10 +31,10 @@ app.post('/api/highscore', async (req, res) => {
       return res.status(400).json({ message: 'Invalid data types or moves must be positive' });
     }
 
-    // Fetch existing high score
+    // Fetch existing high score for the level
     const existingHighScore = await HighScore.findOne({ level }).sort({ moves: 1 });
 
-    // Check if a new high score should be saved
+    // Check if the current score is a new high score
     if (!existingHighScore || moves < existingHighScore.moves) {
       const newHighScore = new HighScore({ username, moves, level });
       await newHighScore.save();
@@ -62,10 +63,13 @@ app.get('/api/highscore/:level', async (req, res) => {
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static('client/build'));
-  app.get('*', (req, res) => res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html')));
+  app.get('*', (req, res) =>
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
+  );
 }
 
 // Declare port
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+
