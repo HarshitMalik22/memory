@@ -85,20 +85,20 @@ const AuthState = (props) => {
   const login = async (formData) => {
     // declare config variable with header
     const config = {
-      header: {
+      headers: {
         'Content-Type': 'application/json',
       },
     };
-
+  
     // declare response from post, dispatch to reducer
     try {
-      const res = await axios.post('/api/auth', formData, config);
-
+      const res = await axios.post('https://memory-seven-flax.vercel.app/api/auth', formData, config); // Update the URL here
+  
       dispatch({
         type: LOGIN_SUCCESS,
         payload: res.data,
       });
-
+  
       loadUser();
       // dispatch error if found
     } catch (error) {
@@ -108,6 +108,7 @@ const AuthState = (props) => {
       });
     }
   };
+  
 
   // Logout
   const logout = () => {
@@ -141,3 +142,4 @@ const AuthState = (props) => {
 };
 
 export default AuthState;
+
