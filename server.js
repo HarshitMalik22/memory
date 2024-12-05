@@ -2,40 +2,38 @@ const express = require('express');
 const connectDB = require('./config/db');
 const path = require('path');
 const HighScore = require('./models/HighScore'); // High score model import
-
+const cors = require('cors'); // Import cors
 const app = express();
 
 // Connect DB with error handling
 connectDB();
 
+// Use CORS middleware
+app.use(cors());
+
 // Initialize middleware
 app.use(express.json());
 
 // Define Routes
-app.use('/api/auth', require('./api/auth'));
-app.use('/api/users', require('./api/users'));
-app.use('/api/history', require('./api/history'));
-
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/users', require('./routes/users'));
+app.use('/api/history', require('./routes/history'));
 
 // High Score Route
 app.post('/api/highscore', async (req, res) => {
   try {
     const { username, moves, level } = req.body;
 
-    // Ensure all required fields are present
     if (!username || !moves || !level) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    // Validate the data types
     if (typeof username !== 'string' || typeof moves !== 'number' || typeof level !== 'string' || moves <= 0) {
       return res.status(400).json({ message: 'Invalid data types or moves must be positive' });
     }
 
-    // Fetch existing high score for the level
     const existingHighScore = await HighScore.findOne({ level }).sort({ moves: 1 });
 
-    // Check if the current score is a new high score
     if (!existingHighScore || moves < existingHighScore.moves) {
       const newHighScore = new HighScore({ username, moves, level });
       await newHighScore.save();
@@ -64,9 +62,7 @@ app.get('/api/highscore/:level', async (req, res) => {
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static('client/build'));
-  app.get('*', (req, res) =>
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
-  );
+  app.get('*', (req, res) => res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html')));
 }
 
 // Declare port
